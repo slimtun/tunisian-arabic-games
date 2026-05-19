@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taswira Challenge — Learn Tunisian Arabic (Derja)</title>
+    <!-- Tailwind CSS for modern utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .title-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom keyframe animations for polished micro-interactions */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes fire-pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.6)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.9)); }
+        }
+        .animate-fire {
+            animation: fire-pulse 1s ease-in-out infinite;
+        }
+        /* Style scrollbar for clean aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(203, 213, 225, 1);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-tr from-slate-50 via-sky-50 to-indigo-50 min-h-screen flex flex-col items-center justify-between text-slate-800 antialiased overflow-x-hidden p-4">
+
+    <!-- Canvas overlay for custom high-performance particles/confetti -->
+    <canvas id="particleCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-2xl flex items-center justify-between py-2 mb-4 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+            <span class="text-3xl animate-float">🇹🇳</span>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-indigo-950 title-font">Taswira Challenge</h1>
+                <p class="text-xs text-slate-500 font-semibold tracking-wider uppercase">Tunisian Derja Vocabulary</p>
+            </div>
+        </div>
+        
+        <!-- Interactive Tool Actions -->
+        <div class="flex items-center gap-2">
+            <!-- Audio Toggle -->
+            <button id="soundToggleBtn" onclick="toggleSound()" class="p-2.5 rounded-full bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition-all focus:outline-none" title="Toggle sound effects">
+                <svg id="soundOnIcon" class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                <svg id="soundOffIcon" class="w-5 h-5 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+            </button>
+            <!-- Help/Info Toggle -->
+            <button onclick="toggleInfoModal()" class="p-2.5 rounded-full bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition-all focus:outline-none" title="How to play">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="w-full max-w-md flex-grow flex flex-col justify-center items-center my-2">
+        
+        <!-- Screen 1: Welcome / Main Menu -->
+        <div id="welcomeScreen" class="w-full bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 flex flex-col items-center text-center space-y-6 animate-pop">
+            <div class="relative">
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-400 via-pink-500 to-indigo-600 blur opacity-40 animate-pulse"></div>
+                <div class="relative bg-white p-6 rounded-3xl border border-slate-100 shadow-inner">
+                    <span class="text-7xl block animate-float">💡</span>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h2 class="text-3xl font-extrabold tracking-tight text-indigo-950 title-font">Taswira Challenge</h2>
+                <p class="text-slate-500 max-w-xs mx-auto text-sm leading-relaxed">
+                    Master Tunisian Arabic (Derja) vocabulary through fun visual association! Written in genuine <strong class="text-indigo-600">Arabizi</strong>.
+                </p>
+            </div>
+
+            <!-- Interactive quick introduction about Arabizi -->
+            <div class="w-full bg-slate-50 rounded-2xl p-4 text-left border border-slate-100">
+                <span class="text-xs font-bold text-indigo-800 uppercase tracking-widest block mb-2">Arabizi Quick Key 🔑</span>
+                <div class="grid grid-cols-3 gap-2 text-xs font-semibold text-slate-600">
+                    <div class="bg-white p-2 rounded-lg border border-slate-100 text-center"><span class="text-indigo-600 font-bold text-sm">7</span> = ح</div>
+                    <div class="bg-white p-2 rounded-lg border border-slate-100 text-center"><span class="text-indigo-600 font-bold text-sm">3</span> = ع</div>
+                    <div class="bg-white p-2 rounded-lg border border-slate-100 text-center"><span class="text-indigo-600 font-bold text-sm">q</span> = ق</div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-extrabold rounded-2xl text-lg shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2">
+                <span>Let's Play!</span>
+                <svg class="w-5 h-5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+
+        <!-- Screen 2: Active Gameplay Board -->
+        <div id="gameScreen" class="w-full flex flex-col space-y-4 hidden animate-pop">
+            
+            <!-- Utility Actions (Main Menu Exit Hatch) -->
+            <div class="flex justify-between items-center px-1">
+                <button onclick="goHome()" class="text-xs font-bold text-slate-500 hover:text-indigo-600 bg-white border border-slate-200/80 hover:border-indigo-100 py-1.5 px-3.5 rounded-full transition-all flex items-center gap-1.5 shadow-sm focus:outline-none">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span>Main Menu</span>
+                </button>
+                <span class="text-xs text-slate-400 font-semibold">Active Session</span>
+            </div>
+
+            <!-- Dashboard (Score, Progress, Streak Status) -->
+            <div class="w-full bg-white rounded-2xl p-4 border border-slate-100 shadow-md flex items-center justify-between">
+                <!-- Score Counter -->
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-indigo-50 rounded-xl text-indigo-600 font-bold text-lg leading-none flex items-center justify-center">
+                        🏆
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Score</div>
+                        <div id="scoreDisplay" class="text-lg font-extrabold text-slate-800 leading-none">0</div>
+                    </div>
+                </div>
+
+                <!-- Streak Display -->
+                <div class="flex items-center gap-2">
+                    <!-- Dynamic Glowing Streak Badge -->
+                    <div id="streakBadge" class="hidden animate-fire transition-all duration-300">
+                        <span class="bg-gradient-to-r from-amber-500 to-red-600 text-white font-extrabold text-xs px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
+                            🔥 STREAK ON FIRE!
+                        </span>
+                    </div>
+
+                    <div class="p-2 bg-amber-50 rounded-xl text-amber-500 font-bold text-lg leading-none flex items-center justify-center">
+                        🔥
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Streak</div>
+                        <div id="streakDisplay" class="text-lg font-extrabold text-slate-800 leading-none">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Card Box -->
+            <div class="w-full bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/35 overflow-hidden flex flex-col items-center">
+                <!-- Visual progress bar inside the card top -->
+                <div class="w-full h-1.5 bg-slate-100">
+                    <div id="progressBar" class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <div class="p-6 w-full flex flex-col items-center space-y-6">
+                    <!-- Question Title/Instruction -->
+                    <div class="text-center">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-1">Question <span id="currentRoundDisplay">1</span> of <span id="totalRoundsDisplay">10</span></span>
+                        <h3 class="text-xl font-extrabold text-slate-800 title-font">Chniya l-taswira hédhi?</h3>
+                        <p class="text-xs text-slate-500 font-medium italic mt-0.5">"What is this picture?"</p>
+                    </div>
+
+                    <!-- Cartoon / Visual Flashcard Box with English Label at the Bottom -->
+                    <div id="visualBox" class="w-full max-w-[200px] aspect-square rounded-2xl border-4 border-slate-50 shadow-inner flex flex-col items-center justify-between p-4 transform transition-all duration-300 relative select-none">
+                        <div></div> <!-- top spacer for aligning center -->
+                        <span id="visualEmoji" class="block animate-float flex items-center justify-center"></span>
+                        <span id="visualEnglish" class="text-xs uppercase font-extrabold tracking-wider bg-white/75 text-slate-700 py-1 px-3 rounded-full shadow-sm border border-slate-100/50"></span>
+                    </div>
+
+                    <!-- 50/50 Dual Choice Options Grid -->
+                    <div class="w-full grid grid-cols-2 gap-3" id="optionsContainer">
+                        <!-- Left Option Option 1 -->
+                        <button id="optionBtnA" onclick="checkAnswer(0)" class="option-btn py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] border-2 border-slate-200/80 hover:border-indigo-200 rounded-2xl text-center text-lg font-extrabold text-indigo-950 shadow-sm transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px]">
+                            <!-- Injected dynamically -->
+                        </button>
+                        <!-- Right Option Option 2 -->
+                        <button id="optionBtnB" onclick="checkAnswer(1)" class="option-btn py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] border-2 border-slate-200/80 hover:border-indigo-200 rounded-2xl text-center text-lg font-extrabold text-indigo-950 shadow-sm transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px]">
+                            <!-- Injected dynamically -->
+                        </button>
+                    </div>
+
+                    <!-- Next Action Button (Renders only after selection) -->
+                    <div class="w-full pt-1">
+                        <button id="nextBtn" onclick="nextQuestion()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-extrabold rounded-2xl text-lg shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 hidden animate-pop">
+                            <span>Next Challenge</span>
+                            <svg class="w-5 h-5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: Game Over & Congratulations -->
+        <div id="gameOverScreen" class="w-full bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 flex flex-col items-center text-center space-y-6 hidden animate-pop">
+            <div class="relative">
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-400 to-emerald-500 blur opacity-40 animate-pulse"></div>
+                <div class="relative bg-white p-6 rounded-3xl border border-slate-100 shadow-inner">
+                    <span id="completionEmoji" class="text-7xl block animate-float">🎉</span>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h2 id="resultTitle" class="text-3xl font-extrabold tracking-tight text-indigo-950 title-font">Saha, Mabrouk!</h2>
+                <p id="resultSubtitle" class="text-slate-500 max-w-xs mx-auto text-sm leading-relaxed">
+                    You completed the Taswira Challenge! Let's review your linguistic victory:
+                </p>
+            </div>
+
+            <!-- Detailed Performance Metrics -->
+            <div class="w-full bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
+                <div class="flex justify-between items-center text-sm font-bold py-1 border-b border-slate-200/60">
+                    <span class="text-slate-500">Total Correct Answers</span>
+                    <span id="finalScore" class="text-indigo-600 text-base font-black">0/10</span>
+                </div>
+                <div class="flex justify-between items-center text-sm font-bold py-1 border-b border-slate-200/60">
+                    <span class="text-slate-500">Highest Streak Achieved</span>
+                    <span id="finalMaxStreak" class="text-amber-500 text-base font-black flex items-center gap-1">0 🔥</span>
+                </div>
+                <div class="flex justify-between items-center text-sm font-bold py-1">
+                    <span class="text-slate-500">Accuracy Rating</span>
+                    <span id="accuracyRating" class="text-emerald-600 text-base font-black">0%</span>
+                </div>
+            </div>
+
+            <div class="w-full space-y-2">
+                <button onclick="startGame()" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-extrabold rounded-2xl text-lg shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.5"></path></svg>
+                    <span>Play Again</span>
+                </button>
+                <button onclick="goHome()" class="w-full py-3 px-6 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-sm transition-all">
+                    Back to Main Menu
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Copyright & Attribution -->
+    <footer class="w-full max-w-2xl text-center py-4 border-t border-slate-100/80 mt-4 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 font-semibold gap-2">
+        <p>&copy; 2026 Astafeed Tunisian Arabic. All Rights Reserved.</p>
+        <p>Made with ❤️ in Tunisia 🇹🇳</p>
+    </footer>
+
+    <!-- Interactive Help/Information Modal -->
+    <div id="infoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-slate-100 shadow-2xl space-y-5 animate-pop text-slate-700">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-xl font-extrabold text-indigo-950 title-font flex items-center gap-2">
+                    <span>💡 How to Play</span>
+                </h3>
+                <button onclick="toggleInfoModal()" class="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-sm leading-relaxed">
+                <p>
+                    <strong>Tunisian Arabic (Derja)</strong> uses special phonetics. To write it using standard keyboards, locals invented <strong>Arabizi</strong>—using numbers for sounds that don't exist in Latin letters.
+                </p>
+                
+                <div class="space-y-2.5 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">7</span>
+                        <span class="text-xs text-slate-600">Representing <strong>ح</strong> (e.g. <em>7outa</em>, <em>toffe7a</em>)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">3</span>
+                        <span class="text-xs text-slate-600">Representing <strong>ع</strong> (e.g. <em>3asfoura</em>)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">q</span>
+                        <span class="text-xs text-slate-600">Representing <strong>ق</strong> (e.g. <em>qattous</em>)</span>
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-400 italic">
+                    Earn streaks of <strong>5 or more</strong> correct answers in a row to ignite your fire! Can you reach a perfect score?
+                </p>
+            </div>
+
+            <button onclick="toggleInfoModal()" class="w-full py-3.5 bg-slate-950 hover:bg-slate-800 text-white font-extrabold rounded-2xl text-sm shadow-md transition-all">
+                Understood, Let's Go!
+            </button>
+        </div>
+    </div>
+
+    <!-- Dynamic JavaScript Game Engine -->
+    <script>
+        // Custom Inline SVGs used to perfectly render unique vocabulary items
+        const tableSvg = `<svg class="w-24 h-24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="35" width="70" height="12" rx="4" fill="#8B4513"/><rect x="25" y="47" width="8" height="38" fill="#A0522D"/><rect x="67" y="47" width="8" height="38" fill="#A0522D"/><rect x="15" y="47" width="70" height="4" fill="#5C2E0B"/></svg>`;
+        const plateSvg = `<svg class="w-24 h-24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="4"/><circle cx="50" cy="50" r="28" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="2"/><circle cx="50" cy="50" r="26" fill="#F8FAFC"/></svg>`;
+        const forkSvg = `<svg class="w-20 h-20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 20V45C40 49.4 43.6 53 48 53C52.4 53 56 49.4 56 45V20" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/><path d="M48 20V45" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/><path d="M48 53V85" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/></svg>`;
+
+        // Full Pool of 100 Tunisian Arabic Nouns (Objects, Animals, Human Beings) mapped with English definitions
+        const gameDataset = [
+            { visual: "👨", correct: "rajel", distractor: "mra", english: "Man" },
+            { visual: "👩", correct: "mra", distractor: "rajel", english: "Woman" },
+            { visual: "👦", correct: "tfol", distractor: "tofla", english: "Boy" },
+            { visual: "👧", correct: "tofla", distractor: "tfol", english: "Girl" },
+            { visual: "👶", correct: "bébé", distractor: "tawla", english: "Baby" },
+            { visual: "🚸", correct: "sghir", distractor: "kbir", english: "Child" },
+            { visual: "👴", correct: "rajel kbir", distractor: "tfol", english: "Old Man" },
+            { visual: "👵", correct: "mra kbira", distractor: "tofla", english: "Old Woman" },
+            { visual: "🤝", correct: "sa7eb", distractor: "3dou", english: "Friend (M)" },
+            { visual: "👭", correct: "sa7ba", distractor: "jara", english: "Friend (F)" },
+            { visual: "🥼", correct: "tbib", distractor: "mou3allem", english: "Doctor" },
+            { visual: "🧑‍🏫", correct: "mou3allem", distractor: "tbib", english: "Teacher" },
+            { visual: "👮", correct: "boulisi", distractor: "tbib", english: "Police" },
+            { visual: "👨‍🌾", correct: "bayye3", distractor: "cheri", english: "Seller" },
+            { visual: "🏡", correct: "jar", distractor: "barra", english: "Neighbor" },
+            { visual: "🐶", correct: "kalb", distractor: "qattous", english: "Dog" },
+            { visual: "🐱", correct: "qattous", distractor: "kalb", english: "Cat" },
+            { visual: "🐟", correct: "7outa", distractor: "djeja", english: "Fish" },
+            { visual: "🐦", correct: "3asfoura", distractor: "7asfoura", english: "Bird" },
+            { visual: "🦁", correct: "sid", distractor: "zarafa", english: "Lion" },
+            { visual: "🐔", correct: "djeja", distractor: "7outa", english: "Chicken" },
+            { visual: "🫏", correct: "bhim", distractor: "7san", english: "Donkey" },
+            { visual: "🐎", correct: "7san", distractor: "karhba", english: "Horse" },
+            { visual: "🐪", correct: "jmal", distractor: "ghzela", english: "Camel" },
+            { visual: "🐑", correct: "3alloush", distractor: "me3za", english: "Sheep" },
+            { visual: "🐄", correct: "bagra", distractor: "3alloush", english: "Cow" },
+            { visual: "🐭", correct: "far", distractor: "qattous", english: "Mouse" },
+            { visual: "🐰", correct: "arnab", distractor: "jmal", english: "Rabbit" },
+            { visual: "🪰", correct: "thebbena", distractor: "nemousa", english: "Fly" },
+            { visual: "🦟", correct: "nemousa", distractor: "thebbena", english: "Mosquito" },
+            { visual: "🐸", correct: "jrana", distractor: "7nash", english: "Frog" },
+            { visual: "🐍", correct: "7nash", distractor: "jrana", english: "Snake" },
+            { visual: "🐘", correct: "fil", distractor: "ghzela", english: "Elephant" },
+            { visual: "🦋", correct: "fartattou", distractor: "3asfoura", english: "Butterfly" },
+            { visual: "🐐", correct: "me3za", distractor: "bagra", english: "Goat" },
+            { visual: "🚗", correct: "karhba", distractor: "biskla", english: "Car" },
+            { visual: "🪑", correct: "korsi", distractor: "tawla", english: "Chair" },
+            { visual: "🏠", correct: "dar", distractor: "bit", english: "House" },
+            { visual: tableSvg, correct: "tawla", distractor: "korsi", english: "Table" },
+            { visual: "🪟", correct: "shobbek", distractor: "beb", english: "Window" },
+            { visual: "🚪", correct: "beb", distractor: "shobbek", english: "Door" },
+            { visual: "🔑", correct: "mifte7", distractor: "beb", english: "Key" },
+            { visual: "📱", correct: "telifoun", distractor: "telfza", english: "Phone" },
+            { visual: "📺", correct: "telfza", distractor: "telifoun", english: "Television" },
+            { visual: "🖊️", correct: "stylo", distractor: "kteb", english: "Pen" },
+            { visual: "📖", correct: "kteb", distractor: "stylo", english: "Book" },
+            { visual: "📓", correct: "korrasa", distractor: "kteb", english: "Notebook" },
+            { visual: "🛏️", correct: "farsh", distractor: "korsi", english: "Bed" },
+            { visual: "🥛", correct: "kes", distractor: "s7an", english: "Cup" },
+            { visual: plateSvg, correct: "s7an", distractor: "kes", english: "Plate" },
+            { visual: "🥄", correct: "mgharfa", distractor: "forshita", english: "Spoon" },
+            { visual: forkSvg, correct: "forshita", distractor: "mgharfa", english: "Fork" },
+            { visual: "🔪", correct: "sekkina", distractor: "mgharfa", english: "Knife" },
+            { visual: "⏰", correct: "mongela", distractor: "telfza", english: "Clock" },
+            { visual: "🪞", correct: "mreya", distractor: "shobbek", english: "Mirror" },
+            { visual: "🚲", correct: "biskla", distractor: "karhba", english: "Bicycle" },
+            { visual: "🚄", correct: "train", distractor: "karhba", english: "Train" },
+            { visual: "⛵", correct: "flouka", distractor: "karhba", english: "Boat" },
+            { visual: "👟", correct: "sabbat", distractor: "shleka", english: "Shoe" },
+            { visual: "🩴", correct: "shleka", distractor: "sabbat", english: "Slippers" },
+            { visual: "🎩", correct: "tarbousha", distractor: "chechia", english: "Hat" },
+            { visual: "🛍️", correct: "sac", distractor: "kteb", english: "Bag / Sack" },
+            { visual: "☔", correct: "mthalla", distractor: "tarbousha", english: "Umbrella" },
+            { visual: "🛏️", correct: "mkhadda", distractor: "farsh", english: "Pillow" },
+            { visual: "🕯️", correct: "sham3a", distractor: "thaw", english: "Candle" },
+            { visual: "🍏", correct: "toffe7a", distractor: "banana", english: "Apple" },
+            { visual: "🍞", correct: "khobz", distractor: "ma", english: "Bread" },
+            { visual: "💧", correct: "ma", distractor: "khobz", english: "Water" },
+            { visual: "🥛", correct: "7lib", distractor: "qahwa", english: "Milk" },
+            { visual: "☕", correct: "qahwa", distractor: "7lib", english: "Coffee" },
+            { visual: "🍵", correct: "thé", distractor: "qahwa", english: "Tea" },
+            { visual: "🧀", correct: "jbin", distractor: "khobz", english: "Cheese" },
+            { visual: "🥚", correct: "3athma", distractor: "djeja", english: "Egg" },
+            { visual: "🧅", correct: "bsal", distractor: "thoum", english: "Onion" },
+            { visual: "🧄", correct: "thoum", distractor: "bsal", english: "Garlic" },
+            { visual: "🍅", correct: "tmatem", distractor: "qares", english: "Tomato" },
+            { visual: "🍋", correct: "qares", distractor: "tmatem", english: "Lemon" },
+            { visual: "🍉", correct: "dille3a", distractor: "battikha", english: "Watermelon" },
+            { visual: "🍈", correct: "battikha", distractor: "dille3a", english: "Melon" },
+            { visual: "🍌", correct: "banana", distractor: "toffe7a", english: "Banana" },
+            { visual: "🫒", correct: "zitoun", distractor: "ma", english: "Olives" },
+            { visual: "🍊", correct: "bordguen", distractor: "qares", english: "Orange" },
+            { visual: "🌴", correct: "degla", distractor: "khobz", english: "Dates" },
+            { visual: "🥩", correct: "l7am", distractor: "djeja", english: "Meat" },
+            { visual: "🍰", correct: "7lou", distractor: "qares", english: "Sweets / Cake" },
+            { visual: "🌳", correct: "shojra", distractor: "warda", english: "Tree" },
+            { visual: "🌹", correct: "warda", distractor: "shojra", english: "Flower" },
+            { visual: "☀️", correct: "shams", distractor: "gamra", english: "Sun" },
+            { visual: "🌙", correct: "gamra", distractor: "shams", english: "Moon" },
+            { visual: "⭐", correct: "nejma", distractor: "gamra", english: "Star" },
+            { visual: "☁️", correct: "s7aba", distractor: "mtar", english: "Cloud" },
+            { visual: "🌧️", correct: "mtar", distractor: "s7aba", english: "Rain" },
+            { visual: "⛰️", correct: "jbal", distractor: "b7ar", english: "Mountain" },
+            { visual: "🌊", correct: "b7ar", distractor: "jbal", english: "Sea / Beach" },
+            { visual: "🤚", correct: "yid", distractor: "seq", english: "Hand" },
+            { visual: "🦶", correct: "seq", distractor: "yid", english: "Leg / Foot" },
+            { visual: "👤", correct: "ras", distractor: "3in", english: "Head" },
+            { visual: "👁️", correct: "3in", distractor: "ras", english: "Eye" },
+            { visual: "👃", correct: "khsham", distractor: "fomm", english: "Nose" },
+            { visual: "👄", correct: "fomm", distractor: "khsham", english: "Mouth" }
+        ];
+
+        // Dynamic pastel color arrays for beautiful card aesthetics
+        const pastelColors = [
+            "bg-rose-100", "bg-amber-100", "bg-emerald-100", "bg-sky-100", 
+            "bg-indigo-100", "bg-purple-100", "bg-teal-100", "bg-orange-100", 
+            "bg-lime-100", "bg-fuchsia-100"
+        ];
+
+        // Game state variables
+        const ROUND_SIZE = 10; // Number of questions per play session
+        let activeSessionQuestions = [];
+        let currentIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let isAnswered = false;
+        let soundEnabled = true;
+
+        // Particle configuration for custom effects canvas
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        // Particle constructor
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 4;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * -6 - 2;
+                this.color = color;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+                this.gravity = 0.15;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += this.gravity;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createExplosion(x, y, isSuccess) {
+            const colors = isSuccess 
+                ? ["#10B981", "#34D399", "#059669", "#A7F3D0", "#FFD700"] 
+                : ["#EF4444", "#F87171", "#DC2626", "#FCA5A5"];
+            for (let i = 0; i < 25; i++) {
+                particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Audio synthesis engine using Web Audio API
+        function playSfx(type) {
+            if (!soundEnabled) return;
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'success') {
+                    osc.type = 'triangle';
+                    const now = audioCtx.currentTime;
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'failure') {
+                    osc.type = 'sawtooth';
+                    const now = audioCtx.currentTime;
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'streak') {
+                    osc.type = 'sine';
+                    const now = audioCtx.currentTime;
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.45);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                }
+            } catch (error) {
+                console.warn("Audio Context blocked or unsupported:", error);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById("soundOnIcon").classList.toggle("hidden", !soundEnabled);
+            document.getElementById("soundOffIcon").classList.toggle("hidden", soundEnabled);
+        }
+
+        function toggleInfoModal() {
+            const modal = document.getElementById("infoModal");
+            if (modal.classList.contains("hidden")) {
+                modal.classList.remove("hidden");
+                modal.style.opacity = "1";
+            } else {
+                modal.classList.add("hidden");
+            }
+        }
+
+        // Initialize and Start Game
+        function startGame() {
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            currentIdx = 0;
+            
+            // SHUFFLE ALGORITHM: Fisher-Yates shuffle entire 100 word pool, then pick 10 words for the session
+            const shuffledPool = [...gameDataset].sort(() => Math.random() - 0.5);
+            activeSessionQuestions = shuffledPool.slice(0, ROUND_SIZE);
+            
+            // Switch layouts
+            document.getElementById("welcomeScreen").classList.add("hidden");
+            document.getElementById("gameOverScreen").classList.add("hidden");
+            document.getElementById("gameScreen").classList.remove("hidden");
+            
+            updateStatsDashboard();
+            loadQuestion();
+        }
+
+        function goHome() {
+            document.getElementById("gameOverScreen").classList.add("hidden");
+            document.getElementById("gameScreen").classList.add("hidden");
+            document.getElementById("welcomeScreen").classList.remove("hidden");
+        }
+
+        function updateStatsDashboard() {
+            document.getElementById("scoreDisplay").textContent = score;
+            document.getElementById("streakDisplay").textContent = streak;
+            
+            const streakBadge = document.getElementById("streakBadge");
+            if (streak >= 5) {
+                if (streakBadge.classList.contains("hidden")) {
+                    streakBadge.classList.remove("hidden");
+                    playSfx('streak');
+                    const rect = streakBadge.getBoundingClientRect();
+                    createExplosion(rect.left + 50, rect.top + 20, true);
+                }
+            } else {
+                streakBadge.classList.add("hidden");
+            }
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            document.getElementById("nextBtn").classList.add("hidden");
+            
+            const q = activeSessionQuestions[currentIdx];
+            
+            // Render indexes
+            document.getElementById("currentRoundDisplay").textContent = currentIdx + 1;
+            document.getElementById("totalRoundsDisplay").textContent = ROUND_SIZE;
+            
+            // Progress Bar
+            const percentage = (currentIdx / ROUND_SIZE) * 100;
+            document.getElementById("progressBar").style.width = percentage + "%";
+            
+            // Render flashcard visual and English meaning at the bottom
+            const visualEmoji = document.getElementById("visualEmoji");
+            const visualEnglish = document.getElementById("visualEnglish");
+            
+            // Render custom SVG vector illustrations or default standard emojis seamlessly
+            if (q.visual.startsWith("<svg")) {
+                visualEmoji.innerHTML = q.visual;
+                visualEmoji.className = "block animate-float flex items-center justify-center";
+            } else {
+                visualEmoji.textContent = q.visual;
+                visualEmoji.innerHTML = q.visual;
+                visualEmoji.className = "text-7xl block animate-float flex items-center justify-center";
+            }
+            
+            visualEnglish.textContent = q.english;
+            
+            // Assign a random pastel color background dynamically
+            const visualBox = document.getElementById("visualBox");
+            const randomColorClass = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+            visualBox.className = `w-full max-w-[200px] aspect-square rounded-2xl border-4 border-slate-50 shadow-inner flex flex-col items-center justify-between p-4 transform transition-all duration-300 relative select-none ${randomColorClass}`;
+            
+            // Shuffle correct/distractor options
+            const options = [q.correct, q.distractor];
+            const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+            q.shuffledMap = shuffledOptions;
+            
+            // Reset options
+            const btnA = document.getElementById("optionBtnA");
+            const btnB = document.getElementById("optionBtnB");
+            
+            btnA.className = "option-btn py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] border-2 border-slate-200/80 hover:border-indigo-200 rounded-2xl text-center text-lg font-extrabold text-indigo-950 shadow-sm transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px]";
+            btnB.className = "option-btn py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] border-2 border-slate-200/80 hover:border-indigo-200 rounded-2xl text-center text-lg font-extrabold text-indigo-950 shadow-sm transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px]";
+            
+            btnA.textContent = shuffledOptions[0];
+            btnB.textContent = shuffledOptions[1];
+        }
+
+        function checkAnswer(chosenIndex) {
+            if (isAnswered) return;
+            isAnswered = true;
+            
+            const q = activeSessionQuestions[currentIdx];
+            const chosenWord = q.shuffledMap[chosenIndex];
+            const correctWord = q.correct;
+            const isCorrect = (chosenWord === correctWord);
+            
+            const btnA = document.getElementById("optionBtnA");
+            const btnB = document.getElementById("optionBtnB");
+            const clickedBtn = (chosenIndex === 0) ? btnA : btnB;
+            const nonClickedBtn = (chosenIndex === 0) ? btnB : btnA;
+            
+            if (isCorrect) {
+                clickedBtn.className = "option-btn py-4 px-4 bg-emerald-500 hover:bg-emerald-600 border-2 border-emerald-600 rounded-2xl text-center text-lg font-extrabold text-white shadow-lg shadow-emerald-100 transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px] animate-pop";
+                nonClickedBtn.className = "option-btn py-4 px-4 bg-slate-100 border-2 border-slate-200/50 rounded-2xl text-center text-lg font-extrabold text-slate-400 cursor-not-allowed transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px] opacity-60";
+                
+                score++;
+                streak++;
+                if (streak > maxStreak) {
+                    maxStreak = streak;
+                }
+                playSfx('success');
+                
+                const rect = clickedBtn.getBoundingClientRect();
+                createExplosion(rect.left + (rect.width / 2), rect.top + (rect.height / 2), true);
+            } else {
+                clickedBtn.className = "option-btn py-4 px-4 bg-red-500 hover:bg-red-600 border-2 border-red-600 rounded-2xl text-center text-lg font-extrabold text-white shadow-lg shadow-red-100 transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px] animate-shake";
+                nonClickedBtn.className = "option-btn py-4 px-4 bg-emerald-100 border-2 border-dashed border-emerald-500 rounded-2xl text-center text-lg font-extrabold text-emerald-800 transition-all focus:outline-none flex flex-col items-center justify-center min-h-[80px] animate-pulse";
+                
+                streak = 0;
+                playSfx('failure');
+                
+                const rect = clickedBtn.getBoundingClientRect();
+                createExplosion(rect.left + (rect.width / 2), rect.top + (rect.height / 2), false);
+            }
+            
+            updateStatsDashboard();
+            document.getElementById("nextBtn").classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < ROUND_SIZE) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById("progressBar").style.width = "100%";
+            
+            const accuracy = Math.round((score / ROUND_SIZE) * 100);
+            
+            document.getElementById("finalScore").textContent = `${score}/${ROUND_SIZE}`;
+            document.getElementById("finalMaxStreak").textContent = `${maxStreak} 🔥`;
+            document.getElementById("accuracyRating").textContent = `${accuracy}%`;
+            
+            const resultTitle = document.getElementById("resultTitle");
+            const resultSubtitle = document.getElementById("resultSubtitle");
+            const completionEmoji = document.getElementById("completionEmoji");
+            
+            if (accuracy === 100) {
+                resultTitle.textContent = "Derja Master! 👑";
+                resultSubtitle.textContent = "Flawless score! You have spectacular intuition with Tunisian Arabizi.";
+                completionEmoji.textContent = "🏆";
+                playSfx('streak');
+            } else if (accuracy >= 80) {
+                resultTitle.textContent = "Béhi Barcha! 🌟";
+                resultSubtitle.textContent = "Great job! Your Tunisian vocabulary is highly advanced.";
+                completionEmoji.textContent = "🎉";
+                playSfx('success');
+            } else if (accuracy >= 50) {
+                resultTitle.textContent = "Ya3tik l-Saha! 👍";
+                resultSubtitle.textContent = "Solid performance! Practice a bit more to master all 100 nouns.";
+                completionEmoji.textContent = "📝";
+            } else {
+                resultTitle.textContent = "Chwayya Chwayya! 💪";
+                resultSubtitle.textContent = "Keep challenging your visual memory. Try another round to improve!";
+                completionEmoji.textContent = "🌱";
+            }
+            
+            document.getElementById("gameScreen").classList.add("hidden");
+            document.getElementById("gameOverScreen").classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
