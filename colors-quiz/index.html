@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tounsi Colors - Learn Tunisian Arabic Color Agreement</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Fredoka for friendly game aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for beautiful gaming icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .game-title {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom smooth transition transitions */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Shimmer effect for progress bar */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer-bg {
+            background: linear-gradient(90deg, #3b82f6 25%, #60a5fa 50%, #3b82f6 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-full flex flex-col justify-between">
+
+    <script>
+        // Game state data
+        const NOUNS = [
+            { id: 'maryoul', english: 'shirt', gender: 'm', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] },
+            { id: 'karahba', english: 'car', gender: 'f', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] },
+            { id: 'kteb', english: 'book', gender: 'm', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] },
+            { id: 'tawla', english: 'table', gender: 'f', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] },
+            { id: 'korsi', english: 'chair', gender: 'm', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] },
+            { id: 'qattous', english: 'male cat', gender: 'm', plural: false, allowedColors: ['white', 'black'] },
+            { id: 'qattousa', english: 'female cat', gender: 'f', plural: false, allowedColors: ['white', 'black'] },
+            { id: 'kalb', english: 'dog', gender: 'm', plural: false, allowedColors: ['white', 'black'] },
+            { id: 'sirwel', english: 'pants', gender: 'm', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] },
+            { id: 'sabbat', english: 'shoes', gender: 'm', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] },
+            { id: 'dar', english: 'house', gender: 'f', plural: false, allowedColors: ['white', 'black', 'green', 'red', 'blue', 'yellow'] }
+        ];
+
+        const COLORS = [
+            { id: 'white', english: 'white', m: 'abyath', f: 'bitha', hex: '#F8FAFC', outlineHex: '#94A3B8', textHex: '#475569' },
+            { id: 'black', english: 'black', m: 'ak7al', f: 'ka7la', hex: '#1E293B', outlineHex: '#0F172A', textHex: '#F8FAFC' },
+            { id: 'green', english: 'green', m: 'akhthar', f: 'khathra', hex: '#10B981', outlineHex: '#047857', textHex: '#FFFFFF' },
+            { id: 'red', english: 'red', m: 'a7mar', f: '7amra', hex: '#EF4444', outlineHex: '#B91C1C', textHex: '#FFFFFF' },
+            { id: 'blue', english: 'blue', m: 'azraq', f: 'zarqa', hex: '#3B82F6', outlineHex: '#1D4ED8', textHex: '#FFFFFF' },
+            { id: 'yellow', english: 'yellow', m: 'asfar', f: 'safra', hex: '#EAB308', outlineHex: '#A16207', textHex: '#1E293B' }
+        ];
+
+        // Global app state
+        let state = {
+            currentScreen: 'welcome', // welcome, study, quiz, summary
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            questionIndex: 0,
+            totalQuestions: 10,
+            currentQuestion: null,
+            quizHistory: [],
+            selectedAnswer: null,
+            isAnswered: false,
+            soundEnabled: true,
+            studySelectedNoun: 'maryoul',
+            studySelectedColor: 'red'
+        };
+    </script>
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 py-4 px-6 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('welcome')">
+                <div class="bg-red-500 text-white p-2.5 rounded-xl shadow-md shadow-red-200 flex items-center justify-center">
+                    <i class="fa-solid fa-language text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="game-title text-xl md:text-2xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                        <span>Tounsi Colors</span>
+                        <span class="text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full border border-red-200">الدارجة</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">Tunisian Arabic Color Agreement Game</p>
+                </div>
+            </div>
+
+            <!-- Stats & Control Bar -->
+            <div class="flex items-center space-x-4">
+                <div class="bg-slate-100 px-3 py-1.5 rounded-full text-slate-600 text-sm font-semibold flex items-center space-x-1.5 shadow-inner">
+                    <i class="fa-solid fa-fire text-amber-500"></i>
+                    <span id="header-streak">0</span>
+                </div>
+                <div class="bg-slate-100 px-3 py-1.5 rounded-full text-slate-600 text-sm font-semibold flex items-center space-x-1.5 shadow-inner">
+                    <i class="fa-solid fa-trophy text-yellow-500"></i>
+                    <span id="header-score">0</span>
+                </div>
+                <button onclick="toggleSound()" class="text-slate-500 hover:text-slate-800 p-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition duration-150" title="Toggle Sound">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex items-center justify-center p-4 md:p-6">
+        <div class="max-w-5xl w-full mx-auto">
+
+            <!-- Screen 1: Welcome/Dashboard Screen -->
+            <div id="screen-welcome" class="space-y-8 animate-fade-in">
+                <div class="text-center max-w-2xl mx-auto space-y-4">
+                    <div class="inline-block bg-red-50 text-red-600 px-4 py-1.5 rounded-full text-sm font-semibold border border-red-100 uppercase tracking-wider">
+                        🇹🇳 Learn Tunisian Derja
+                    </div>
+                    <h2 class="game-title text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+                        Master Arabic Noun-Color Gender Agreement!
+                    </h2>
+                    <p class="text-slate-600 text-md md:text-lg">
+                        In Tunisian Arabic, colors change depending on whether the object is <strong class="text-indigo-600">masculine (m)</strong> or <strong class="text-pink-600">feminine (f)</strong>. Learn the rules, study the illustrations, and test your skills!
+                    </p>
+                </div>
+
+                <!-- Color Vocabulary Cards Quick Preview -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-2 text-center">
+                        <div class="w-10 h-10 rounded-full bg-white border border-slate-300 shadow-inner"></div>
+                        <span class="text-xs font-bold text-slate-400">WHITE</span>
+                        <div class="text-xs text-slate-700">m: <span class="font-bold text-indigo-600">abyath</span></div>
+                        <div class="text-xs text-slate-700">f: <span class="font-bold text-pink-600">bitha</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-2 text-center">
+                        <div class="w-10 h-10 rounded-full bg-slate-900 shadow-inner"></div>
+                        <span class="text-xs font-bold text-slate-400">BLACK</span>
+                        <div class="text-xs text-slate-700">m: <span class="font-bold text-indigo-600">ak7al</span></div>
+                        <div class="text-xs text-slate-700">f: <span class="font-bold text-pink-600">ka7la</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-2 text-center">
+                        <div class="w-10 h-10 rounded-full bg-red-500 shadow-inner"></div>
+                        <span class="text-xs font-bold text-slate-400">RED</span>
+                        <div class="text-xs text-slate-700">m: <span class="font-bold text-indigo-600">a7mar</span></div>
+                        <div class="text-xs text-slate-700">f: <span class="font-bold text-pink-600">7amra</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-2 text-center">
+                        <div class="w-10 h-10 rounded-full bg-blue-500 shadow-inner"></div>
+                        <span class="text-xs font-bold text-slate-400">BLUE</span>
+                        <div class="text-xs text-slate-700">m: <span class="font-bold text-indigo-600">azraq</span></div>
+                        <div class="text-xs text-slate-700">f: <span class="font-bold text-pink-600">zarqa</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-2 text-center">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 shadow-inner"></div>
+                        <span class="text-xs font-bold text-slate-400">GREEN</span>
+                        <div class="text-xs text-slate-700">m: <span class="font-bold text-indigo-600">akhthar</span></div>
+                        <div class="text-xs text-slate-700">f: <span class="font-bold text-pink-600">khathra</span></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-2 text-center">
+                        <div class="w-10 h-10 rounded-full bg-amber-400 shadow-inner"></div>
+                        <span class="text-xs font-bold text-slate-400">YELLOW</span>
+                        <div class="text-xs text-slate-700">m: <span class="font-bold text-indigo-600">asfar</span></div>
+                        <div class="text-xs text-slate-700">f: <span class="font-bold text-pink-600">safra</span></div>
+                    </div>
+                </div>
+
+                <!-- Navigation Choices -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-xl mx-auto pt-4">
+                    <button onclick="navigateTo('study')" class="w-full sm:w-1/2 bg-white hover:bg-slate-100 text-slate-800 font-bold py-4 px-6 rounded-2xl border-2 border-slate-200 transition-all duration-150 flex items-center justify-center space-x-3 shadow-md hover:shadow-lg transform active:scale-95">
+                        <i class="fa-solid fa-graduation-cap text-xl text-indigo-500"></i>
+                        <span>Study & Explore</span>
+                    </button>
+                    <button onclick="startQuiz()" class="w-full sm:w-1/2 bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-150 flex items-center justify-center space-x-3 shadow-lg shadow-red-200 hover:shadow-xl transform active:scale-95">
+                        <i class="fa-solid fa-play text-xl"></i>
+                        <span>Play Game Quiz</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Screen 2: Interactive Study Screen -->
+            <div id="screen-study" class="hidden space-y-6 animate-fade-in">
+                <!-- Top Nav inside study -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200">
+                    <div>
+                        <h3 class="game-title text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-indigo-500"></i>
+                            Interactive Grammar Sandbox
+                        </h3>
+                        <p class="text-sm text-slate-500">Choose a noun and a color to explore the correct Tunisan Arabic configuration.</p>
+                    </div>
+                    <button onclick="navigateTo('welcome')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 px-4 rounded-xl transition duration-150 flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Main
+                    </button>
+                </div>
+
+                <!-- Main Study Playground Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left Column: Nouns Selector -->
+                    <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                        <div class="border-b border-slate-100 pb-2">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Step 1: Choose a Noun</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 max-h-[380px] overflow-y-auto pr-1" id="study-nouns-grid">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Middle Column: Live Illustration & Translation Card -->
+                    <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-between min-h-[400px] shadow-sm relative">
+                        <!-- Gender Indicator Badge -->
+                        <div class="absolute top-4 left-4" id="study-gender-badge">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <!-- Graphic Container -->
+                        <div class="w-full flex-grow flex items-center justify-center min-h-[220px] max-h-[250px] my-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner" id="study-illustration-container">
+                            <!-- SVG Rendered dynamically -->
+                        </div>
+
+                        <!-- Translation Breakdown -->
+                        <div class="w-full text-center space-y-2 border-t border-slate-100 pt-4 mt-auto">
+                            <div class="text-xs text-slate-400 font-bold uppercase tracking-wider" id="study-english-label">a red shirt</div>
+                            <div class="text-3xl font-extrabold text-slate-900 game-title tracking-wide" id="study-arabic-combination">maryoul a7mar</div>
+                            <div class="text-xs text-slate-500" id="study-grammar-explanation">
+                                Because <strong>maryoul</strong> is <strong>masculine</strong>, we use the masculine form <strong>a7mar</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Color Selector -->
+                    <div class="lg:col-span-3 bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                        <div class="border-b border-slate-100 pb-2">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Step 2: Choose a Color</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2" id="study-colors-grid">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3.5 mt-4 text-xs text-indigo-900 leading-relaxed">
+                            <h4 class="font-bold flex items-center gap-1 mb-1 text-indigo-950">
+                                <i class="fa-solid fa-circle-info"></i> Grammar Pro-Tip
+                            </h4>
+                            In Tunisian Arabic, adjectives like colors always go <span class="underline decoration-indigo-300 decoration-2 font-bold">after the noun</span>!
+                            <div class="mt-2 font-semibold">Example:</div>
+                            "Karahba (car) + Safra (yellow) = Karahba safra"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="startQuiz()" class="inline-flex items-center space-x-2.5 bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-8 rounded-xl transition duration-150 shadow-md shadow-red-200 hover:shadow-lg transform active:scale-95">
+                        <i class="fa-solid fa-circle-play text-lg"></i>
+                        <span>Start Game with your knowledge!</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Screen 3: Quiz Arena -->
+            <div id="screen-quiz" class="hidden space-y-6 animate-fade-in">
+                <!-- Progress Header -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between text-xs md:text-sm text-slate-500 font-bold">
+                        <span class="flex items-center gap-1">
+                            <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md">Question <span id="quiz-question-num">1</span> of <span id="quiz-total-num">10</span></span>
+                        </span>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-slate-600 flex items-center gap-1">
+                                <i class="fa-solid fa-fire text-amber-500 animate-pulse"></i> Streak: <span id="quiz-streak" class="text-slate-900 font-extrabold">0</span>
+                            </span>
+                            <span class="text-slate-600 flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-500"></i> Score: <span id="quiz-score" class="text-slate-900 font-extrabold">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Master Progress Bar Container -->
+                    <div class="w-full bg-slate-100 rounded-full h-3.5 shadow-inner overflow-hidden">
+                        <div id="quiz-progress-fill" class="h-full rounded-full transition-all duration-300 shimmer-bg" style="width: 10%;"></div>
+                    </div>
+                </div>
+
+                <!-- Main Quiz Board Container -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                    
+                    <!-- Left Card: Dynamic Vector Graphic Area -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-center min-h-[300px] shadow-sm">
+                        <!-- Dynamic SVG Graphic rendering goes here -->
+                        <div id="quiz-graphic-container" class="w-full flex-grow flex items-center justify-center min-h-[200px] max-h-[250px] p-6 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner relative">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                        
+                        <!-- English Description prompt -->
+                        <div class="text-center mt-4 space-y-1">
+                            <span id="quiz-target-english" class="text-2xl font-black text-slate-900 capitalize tracking-wide">a red car</span>
+                            <p class="text-sm text-slate-500">Choose the correct Tunisian Arabic phrase matching the item above</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Card: Multiple Choice Panel -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Options</span>
+                            <!-- Option Grid Buttons -->
+                            <div class="grid grid-cols-1 gap-3.5" id="quiz-options-container">
+                                <!-- Option buttons dynamic generation -->
+                            </div>
+                        </div>
+
+                        <!-- Feedback area (Correct / Incorrect explanation block) -->
+                        <div id="quiz-feedback-block" class="hidden mt-6 rounded-xl p-4 border animate-fade-in transition-all-300">
+                            <!-- Inner Content filled dynamically -->
+                        </div>
+
+                        <!-- Continue CTA / Submit Section -->
+                        <div class="mt-6 flex justify-end">
+                            <button id="quiz-submit-btn" onclick="handleContinueQuiz()" class="w-full py-4 px-6 rounded-xl font-bold transition-all duration-150 shadow-md transform active:scale-95 flex items-center justify-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white cursor-pointer" disabled>
+                                <span id="quiz-btn-text">Select an Answer</span>
+                                <i id="quiz-btn-icon" class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 4: Summary Screen -->
+            <div id="screen-summary" class="hidden space-y-8 animate-fade-in max-w-3xl mx-auto">
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+                    <!-- Top Ribbon -->
+                    <div class="bg-slate-900 text-white p-8 text-center space-y-3 relative">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none"></div>
+                        <div class="inline-flex bg-white/10 text-white px-4 py-1.5 rounded-full text-sm font-semibold border border-white/20">
+                            🎓 Quiz Completed!
+                        </div>
+                        <h2 class="game-title text-3xl md:text-5xl font-extrabold tracking-tight">Ya’teek es-Saha!</h2>
+                        <p class="text-slate-300 text-sm md:text-md">Excellent effort practicing Tunisian color grammar!</p>
+                    </div>
+
+                    <!-- Scores & Achievements Grid -->
+                    <div class="p-8 grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-slate-100">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-150 text-center space-y-1 shadow-sm">
+                            <span class="text-xs font-semibold text-slate-400 block uppercase">Final Score</span>
+                            <div class="text-3xl font-black text-slate-800 flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-star text-yellow-500"></i>
+                                <span id="summary-score">0</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-150 text-center space-y-1 shadow-sm">
+                            <span class="text-xs font-semibold text-slate-400 block uppercase">Accuracy</span>
+                            <div class="text-3xl font-black text-slate-800 flex items-center justify-center gap-1.5" id="summary-accuracy-color">
+                                <i class="fa-solid fa-percentage text-emerald-500"></i>
+                                <span id="summary-accuracy">0%</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-150 text-center space-y-1 shadow-sm">
+                            <span class="text-xs font-semibold text-slate-400 block uppercase">Max Streak</span>
+                            <div class="text-3xl font-black text-slate-800 flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-fire text-amber-500 animate-bounce"></i>
+                                <span id="summary-max-streak">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Questions Breakdown History List -->
+                    <div class="p-8 space-y-4">
+                        <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-question text-red-500"></i>
+                            Your Round Summary Breakdown:
+                        </h4>
+                        
+                        <div class="space-y-3" id="summary-breakdown-list">
+                            <!-- Interactive history elements populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Actions Bar -->
+                    <div class="bg-slate-50 p-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                        <button onclick="navigateTo('welcome')" class="w-full sm:w-auto bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3.5 px-6 rounded-2xl transition duration-150 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-home"></i> Back Home
+                        </button>
+                        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                            <button onclick="navigateTo('study')" class="w-full sm:w-auto bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-3.5 px-6 rounded-2xl transition duration-150 flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-graduation-cap"></i> Practice Sandbox
+                            </button>
+                            <button onclick="startQuiz()" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-8 rounded-2xl transition duration-150 flex items-center justify-center gap-1.5 shadow-md shadow-red-200 hover:shadow-lg">
+                                <i class="fa-solid fa-arrows-rotate animate-spin-hover"></i> Retake Quiz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-850 px-6 text-center">
+        <div class="max-w-5xl mx-auto space-y-2">
+            <p>Made with ❤️ to help you learn Tunisian Derja colors. Remember: Adjectives agree in gender and follow the noun!</p>
+            <p class="text-slate-500">Astafeed Tunisian Arabic &copy; 2026. Keep learning, practice makes perfect.</p>
+        </div>
+    </footer>
+
+    <!-- Vector Graphics Generation Module (Dynamic SVGs) -->
+    <script>
+        /**
+         * Dynamic Vector Engine rendering gorgeous inline SVGs.
+         * Renders different items in various custom colored configurations.
+         */
+        function getSVGGraphic(nounId, colorId) {
+            const colorObj = COLORS.find(c => c.id === colorId) || COLORS[0];
+            const fillHex = colorObj.hex;
+            const strokeHex = colorObj.outlineHex;
+            
+            // Adjust text color based on brightness
+            const detailColor = colorObj.id === 'white' ? '#64748B' : '#FFFFFF';
+
+            switch (nounId) {
+                case 'maryoul': // Shirt
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <path d="M25,20 L35,20 C38,25 43,26 50,26 C57,26 62,25 65,20 L75,20 L85,38 L72,42 L72,85 L28,85 L28,42 L15,38 Z" 
+                              fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round"/>
+                        <!-- Shirt Pocket / Stitch Details -->
+                        <rect x="55" y="40" width="16" height="18" rx="2" fill="none" stroke="${strokeHex}" stroke-width="2.5" />
+                        <line x1="28" y1="42" x2="72" y2="42" stroke="${strokeHex}" stroke-width="2" stroke-dasharray="3,3" />
+                        <line x1="28" y1="80" x2="72" y2="80" stroke="${strokeHex}" stroke-width="2" stroke-dasharray="3,3" />
+                    </svg>
+                    `;
+
+                case 'karahba': // Car
+                    return `
+                    <svg viewBox="0 0 120 100" class="w-40 h-40 drop-shadow-md">
+                        <!-- Car Cabin Backing -->
+                        <path d="M15,55 L30,25 L80,25 L95,55 Z" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round" />
+                        <!-- Car Main Chassis Body -->
+                        <rect x="5" y="50" width="110" height="25" rx="8" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round" />
+                        <!-- Car Windows -->
+                        <path d="M33,30 L52,30 L52,50 L23,50 Z" fill="#E2E8F0" stroke="${strokeHex}" stroke-width="2.5" />
+                        <path d="M58,30 L77,30 L87,50 L58,50 Z" fill="#E2E8F0" stroke="${strokeHex}" stroke-width="2.5" />
+                        <!-- Wheels -->
+                        <circle cx="30" cy="78" r="14" fill="#1E293B" stroke="${strokeHex}" stroke-width="3" />
+                        <circle cx="30" cy="78" r="6" fill="#FFFFFF" />
+                        <circle cx="90" cy="78" r="14" fill="#1E293B" stroke="${strokeHex}" stroke-width="3" />
+                        <circle cx="90" cy="78" r="6" fill="#FFFFFF" />
+                        <!-- Headlight -->
+                        <ellipse cx="110" cy="60" r="4" rx="4" ry="6" fill="#FDE047" stroke="${strokeHex}" stroke-width="1.5" />
+                    </svg>
+                    `;
+
+                case 'kteb': // Book
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Book Cover Backing shadow/dimension -->
+                        <path d="M15,15 L75,15 A10,10 0 0,1 85,25 L85,85 A10,10 0 0,1 75,95 L15,95 Z" fill="${strokeHex}" />
+                        <!-- Main Book Cover Surface -->
+                        <path d="M15,10 L72,10 A10,10 0 0,1 82,20 L82,80 A10,10 0 0,1 72,90 L15,90 Z" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round" />
+                        <!-- Book Pages edge -->
+                        <rect x="80" y="20" width="6" height="60" fill="#F1F5F9" stroke="${strokeHex}" stroke-width="2" />
+                        <!-- Binding spine decoration -->
+                        <path d="M22,10 L22,90" stroke="${strokeHex}" stroke-width="3" />
+                        <!-- Book Cover Ribbon Bookmark or emblem -->
+                        <polygon points="40,10 40,55 48,45 56,55 56,10" fill="#EF4444" opacity="0.9" />
+                        <!-- Star Ornament on cover -->
+                        <path d="M50,35 L52,42 L59,42 L53,46 L55,53 L50,49 L45,53 L47,46 L41,42 L48,42 Z" fill="${detailColor}" stroke="${strokeHex}" stroke-width="1.5" />
+                    </svg>
+                    `;
+
+                case 'tawla': // Table
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Table Legs -->
+                        <line x1="20" y1="45" x2="15" y2="90" stroke="${strokeHex}" stroke-width="5" stroke-linecap="round" />
+                        <line x1="35" y1="45" x2="35" y2="85" stroke="${strokeHex}" stroke-width="4.5" stroke-linecap="round" opacity="0.8" />
+                        <line x1="65" y1="45" x2="65" y2="85" stroke="${strokeHex}" stroke-width="4.5" stroke-linecap="round" opacity="0.8" />
+                        <line x1="80" y1="45" x2="85" y2="90" stroke="${strokeHex}" stroke-width="5" stroke-linecap="round" />
+                        
+                        <!-- Table Top Drawer / Support Beam -->
+                        <rect x="15" y="40" width="70" height="12" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" rx="2" />
+                        <!-- Drawer handle -->
+                        <circle cx="50" cy="46" r="2.5" fill="${strokeHex}" />
+                        <!-- Table Top Wooden Surface -->
+                        <ellipse cx="50" cy="35" rx="45" ry="12" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                    </svg>
+                    `;
+
+                case 'korsi': // Chair
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Backrest bars -->
+                        <line x1="30" y1="15" x2="30" y2="50" stroke="${strokeHex}" stroke-width="4" />
+                        <line x1="43" y1="15" x2="43" y2="50" stroke="${strokeHex}" stroke-width="3" />
+                        <line x1="57" y1="15" x2="57" y2="50" stroke="${strokeHex}" stroke-width="3" />
+                        <line x1="70" y1="15" x2="70" y2="50" stroke="${strokeHex}" stroke-width="4" />
+                        
+                        <!-- Backrest top arc -->
+                        <path d="M25,20 Q50,5 75,20" fill="none" stroke="${strokeHex}" stroke-width="5" stroke-linecap="round" />
+                        
+                        <!-- Chair Seat -->
+                        <rect x="22" y="46" width="56" height="8" rx="2" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        
+                        <!-- Legs -->
+                        <line x1="28" y1="54" x2="20" y2="92" stroke="${strokeHex}" stroke-width="5.5" stroke-linecap="round" />
+                        <line x1="72" y1="54" x2="80" y2="92" stroke="${strokeHex}" stroke-width="5.5" stroke-linecap="round" />
+                        <line x1="35" y1="54" x2="38" y2="85" stroke="${strokeHex}" stroke-width="3.5" stroke-linecap="round" opacity="0.8" />
+                        <line x1="65" y1="54" x2="62" y2="85" stroke="${strokeHex}" stroke-width="3.5" stroke-linecap="round" opacity="0.8" />
+                    </svg>
+                    `;
+
+                case 'qattous': // Male Cat (Black/White restriction enforced by caller)
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Tail -->
+                        <path d="M75,45 Q90,30 85,15 Q80,5 72,15 T74,38" fill="none" stroke="${strokeHex}" stroke-width="6" stroke-linecap="round" />
+                        <!-- Back leg -->
+                        <ellipse cx="65" cy="72" rx="14" ry="16" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Cat Body -->
+                        <ellipse cx="48" cy="62" rx="24" ry="18" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Chest/Front Neck -->
+                        <circle cx="34" cy="50" r="14" fill="${fillHex}" />
+                        <!-- Head -->
+                        <circle cx="32" cy="35" r="16" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Ears -->
+                        <polygon points="18,30 22,12 30,24" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" stroke-linejoin="round" />
+                        <polygon points="46,30 42,12 34,24" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" stroke-linejoin="round" />
+                        <!-- Paws -->
+                        <rect x="30" y="75" width="8" height="15" rx="4" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" />
+                        <rect x="42" y="75" width="8" height="15" rx="4" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" />
+                        <rect x="58" y="75" width="8" height="15" rx="4" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" />
+                        <!-- Face elements -->
+                        <ellipse cx="26" cy="34" r="2.5" fill="#38BDF8" />
+                        <ellipse cx="38" cy="34" r="2.5" fill="#38BDF8" />
+                        <polygon points="31,39 33,39 32,41" fill="#FDA4AF" />
+                        <!-- Whisker lines -->
+                        <line x1="18" y1="41" x2="26" y2="41" stroke="${strokeHex}" stroke-width="1.5" />
+                        <line x1="18" y1="45" x2="25" y2="43" stroke="${strokeHex}" stroke-width="1.5" />
+                        <line x1="46" y1="41" x2="38" y2="41" stroke="${strokeHex}" stroke-width="1.5" />
+                        <line x1="46" y1="45" x2="39" y2="43" stroke="${strokeHex}" stroke-width="1.5" />
+                        <!-- Tiny bow-tie or neck ring -->
+                        <circle cx="32" cy="50" r="2.5" fill="#EF4444" />
+                    </svg>
+                    `;
+
+                case 'qattousa': // Female Cat (Black/White restriction enforced by caller)
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Cute Bow on Ear -->
+                        <!-- Tail -->
+                        <path d="M75,45 Q90,30 85,15 Q80,5 72,15 T74,38" fill="none" stroke="${strokeHex}" stroke-width="5.5" stroke-linecap="round" />
+                        <!-- Back leg -->
+                        <ellipse cx="65" cy="72" rx="14" ry="16" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Cat Body -->
+                        <ellipse cx="48" cy="62" rx="24" ry="18" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Head -->
+                        <circle cx="32" cy="35" r="16" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Ears -->
+                        <polygon points="18,30 22,12 30,24" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" stroke-linejoin="round" />
+                        <polygon points="46,30 42,12 34,24" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" stroke-linejoin="round" />
+                        <!-- Pink Bow on Head -->
+                        <circle cx="42" cy="18" r="4.5" fill="#F43F5E" />
+                        <polygon points="42,18 36,13 36,23" fill="#FB7185" stroke="#F43F5E" stroke-width="1" />
+                        <polygon points="42,18 48,13 48,23" fill="#FB7185" stroke="#F43F5E" stroke-width="1" />
+                        <!-- Paws -->
+                        <rect x="30" y="75" width="8" height="15" rx="4" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" />
+                        <rect x="42" y="75" width="8" height="15" rx="4" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" />
+                        <rect x="58" y="75" width="8" height="15" rx="4" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" />
+                        <!-- Face elements with long eyelashes -->
+                        <circle cx="26" cy="34" r="2.5" fill="#10B981" />
+                        <circle cx="38" cy="34" r="2.5" fill="#10B981" />
+                        <path d="M22,31 Q24,28 27,31" fill="none" stroke="${strokeHex}" stroke-width="1.5" />
+                        <path d="M40,31 Q38,28 35,31" fill="none" stroke="${strokeHex}" stroke-width="1.5" />
+                        <polygon points="31,39 33,39 32,41" fill="#FDA4AF" />
+                        <line x1="18" y1="41" x2="26" y2="41" stroke="${strokeHex}" stroke-width="1.2" />
+                        <line x1="46" y1="41" x2="38" y2="41" stroke="${strokeHex}" stroke-width="1.2" />
+                    </svg>
+                    `;
+
+                case 'kalb': // Dog (Black/White restriction)
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Tail -->
+                        <path d="M80,55 Q95,45 92,30 Q88,25 82,38" fill="none" stroke="${strokeHex}" stroke-width="6.5" stroke-linecap="round" />
+                        <!-- Back Legs -->
+                        <rect x="65" y="65" width="10" height="25" rx="5" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3.5" />
+                        <!-- Body -->
+                        <ellipse cx="50" cy="62" rx="26" ry="18" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Front Leg -->
+                        <rect x="35" y="65" width="10" height="25" rx="5" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3.5" />
+                        <rect x="48" y="65" width="10" height="25" rx="5" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3.5" />
+                        <!-- Neck / Head Base -->
+                        <path d="M25,55 L35,35 L45,55 Z" fill="${fillHex}" />
+                        <!-- Head -->
+                        <ellipse cx="28" cy="38" rx="16" ry="14" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" />
+                        <!-- Floppy Dog Ear -->
+                        <path d="M34,28 Q44,38 38,52 Q30,54 32,38 Z" fill="${strokeHex}" />
+                        <!-- Dog Snout -->
+                        <path d="M20,38 Q10,38 14,46 Q24,48 24,38 Z" fill="${fillHex}" stroke="${strokeHex}" stroke-width="3" />
+                        <circle cx="12" cy="40" r="3" fill="#1E293B" />
+                        <!-- Eye -->
+                        <circle cx="25" cy="33" r="2.5" fill="#1E293B" />
+                    </svg>
+                    `;
+
+                case 'sirwel': // Pants
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Trousers silhouette -->
+                        <path d="M25,15 L75,15 L75,30 L64,88 L51,88 L50,45 L49,88 L36,88 L25,30 Z" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4.5" stroke-linejoin="round" />
+                        <!-- Belt Loops / Pocket stitch details -->
+                        <line x1="25" y1="24" x2="75" y2="24" stroke="${strokeHex}" stroke-width="2.5" stroke-dasharray="4,4" />
+                        <path d="M30,15 L30,24" stroke="${strokeHex}" stroke-width="3.5" />
+                        <path d="M50,15 L50,24" stroke="${strokeHex}" stroke-width="3.5" />
+                        <path d="M70,15 L70,24" stroke="${strokeHex}" stroke-width="3.5" />
+                        <!-- Cute folding wrinkles -->
+                        <path d="M30,55 Q35,53 38,58" fill="none" stroke="${strokeHex}" stroke-width="2" />
+                        <path d="M70,55 Q65,53 62,58" fill="none" stroke="${strokeHex}" stroke-width="2" />
+                    </svg>
+                    `;
+
+                case 'sabbat': // Shoes
+                    return `
+                    <svg viewBox="0 0 120 100" class="w-40 h-40 drop-shadow-md">
+                        <!-- Shoe Back (Left Sneaker) -->
+                        <path d="M10,48 L22,25 L40,25 L50,40 L65,48 L65,65 L10,65 Z" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round" />
+                        <!-- White Rubber Sole -->
+                        <rect x="8" y="62" width="59" height="8" rx="2.5" fill="#F8FAFC" stroke="${strokeHex}" stroke-width="2.5" />
+                        <!-- Shoelaces / Tongue details -->
+                        <line x1="33" y1="28" x2="42" y2="38" stroke="${strokeHex}" stroke-width="3" stroke-linecap="round" />
+                        <line x1="30" y1="34" x2="38" y2="44" stroke="${strokeHex}" stroke-width="3" stroke-linecap="round" />
+                        
+                        <!-- Shoe Front (Right Sneaker overlap offset) -->
+                        <path d="M50,53 L62,30 L80,30 L90,45 L105,53 L105,70 L50,70 Z" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round" />
+                        <rect x="48" y="67" width="59" height="8" rx="2.5" fill="#F8FAFC" stroke="${strokeHex}" stroke-width="2.5" />
+                        <line x1="73" y1="33" x2="82" y2="43" stroke="${strokeHex}" stroke-width="3" stroke-linecap="round" />
+                        <line x1="70" y1="39" x2="78" y2="49" stroke="${strokeHex}" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                    `;
+
+                case 'dar': // House
+                    return `
+                    <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-md">
+                        <!-- Chimney -->
+                        <rect x="70" y="15" width="10" height="20" fill="${strokeHex}" />
+                        <!-- Main House Walls -->
+                        <rect x="15" y="45" width="70" height="42" rx="4" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round" />
+                        <!-- Triangular Roof -->
+                        <polygon points="10,48 50,12 90,48" fill="${fillHex}" stroke="${strokeHex}" stroke-width="4" stroke-linejoin="round" />
+                        <polygon points="15,45 50,17 85,45" fill="${strokeHex}" opacity="0.3" />
+                        <!-- Door -->
+                        <rect x="42" y="60" width="16" height="27" rx="2" fill="${strokeHex}" />
+                        <circle cx="47" cy="74" r="1.5" fill="#FFFFFF" />
+                        <!-- Windows -->
+                        <rect x="23" y="55" width="12" height="12" rx="2" fill="#E2E8F0" stroke="${strokeHex}" stroke-width="2.5" />
+                        <line x1="29" y1="55" x2="29" y2="67" stroke="${strokeHex}" stroke-width="1.5" />
+                        <line x1="23" y1="61" x2="35" y2="61" stroke="${strokeHex}" stroke-width="1.5" />
+                        
+                        <rect x="65" y="55" width="12" height="12" rx="2" fill="#E2E8F0" stroke="${strokeHex}" stroke-width="2.5" />
+                        <line x1="71" y1="55" x2="71" y2="67" stroke="${strokeHex}" stroke-width="1.5" />
+                        <line x1="65" y1="61" x2="77" y2="61" stroke="${strokeHex}" stroke-width="1.5" />
+                    </svg>
+                    `;
+                default:
+                    return '';
+            }
+        }
+    </script>
+
+    <!-- Audio System using Web Audio API -->
+    <script>
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                
+                if (type === 'correct') {
+                    // Upward arpeggio (Success chord)
+                    playTone(523.25, 'triangle', now, 0.1); // C5
+                    playTone(659.25, 'triangle', now + 0.08, 0.1); // E5
+                    playTone(783.99, 'triangle', now + 0.16, 0.25); // G5
+                } else if (type === 'incorrect') {
+                    // Sad downward sliding buzz
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now); // A3
+                    osc.frequency.exponentialRampToValueAtTime(110, now + 0.3); // A2
+                    
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'pop') {
+                    // Gentle UI tick/pop
+                    playTone(600, 'sine', now, 0.05, 0.1);
+                } else if (type === 'win') {
+                    // Glorious victory fanfare
+                    playTone(523.25, 'sine', now, 0.1); // C5
+                    playTone(587.33, 'sine', now + 0.1, 0.1); // D5
+                    playTone(659.25, 'sine', now + 0.2, 0.1); // E5
+                    playTone(783.99, 'sine', now + 0.3, 0.3); // G5
+                }
+            } catch (e) {
+                console.warn('Audio play blocked or failed: ', e);
+            }
+        }
+
+        function playTone(freq, type, startTime, duration, volume = 0.15) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, startTime);
+            
+            gain.gain.setValueAtTime(volume, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (state.soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-lg';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-lg text-slate-400';
+            }
+            playSound('pop');
+        }
+    </script>
+
+    <!-- Core UI & Screen Management -->
+    <script>
+        function navigateTo(screenId) {
+            // Update UI State
+            state.currentScreen = screenId;
+            playSound('pop');
+
+            // Hide all screen element wrappers
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-study').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-summary').classList.add('hidden');
+
+            // Show target screen element wrapper
+            const screenEl = document.getElementById(`screen-${screenId}`);
+            if (screenEl) {
+                screenEl.classList.remove('hidden');
+            }
+
+            // Screen Specific Init
+            if (screenId === 'study') {
+                initStudyScreen();
+            } else if (screenId === 'welcome') {
+                updateHeaderStats();
+            }
+        }
+
+        function updateHeaderStats() {
+            document.getElementById('header-streak').innerText = state.maxStreak;
+            document.getElementById('header-score').innerText = state.score;
+        }
+    </script>
+
+    <!-- Study Mode Screen Interactive Logic -->
+    <script>
+        function initStudyScreen() {
+            renderStudyNouns();
+            renderStudyColors();
+            updateStudyView();
+        }
+
+        function renderStudyNouns() {
+            const grid = document.getElementById('study-nouns-grid');
+            grid.innerHTML = '';
+            
+            NOUNS.forEach(noun => {
+                const isSelected = noun.id === state.studySelectedNoun;
+                const genderIcon = noun.gender === 'm' ? 'fa-mars text-indigo-500' : 'fa-venus text-pink-500';
+                const genderLabel = noun.gender === 'm' ? 'Masc' : 'Fem';
+                
+                const btn = document.createElement('button');
+                btn.className = `p-3 rounded-xl border-2 text-left transition-all duration-150 flex flex-col justify-between h-20 shadow-sm transform hover:scale-[1.02] active:scale-95 ${
+                    isSelected 
+                        ? 'border-indigo-600 bg-indigo-50/50' 
+                        : 'border-slate-200 hover:border-slate-350 bg-white'
+                }`;
+                btn.onclick = () => {
+                    selectStudyNoun(noun.id);
+                };
+
+                btn.innerHTML = `
+                    <div class="flex items-center justify-between w-full">
+                        <span class="font-bold text-slate-800 text-sm capitalize">${noun.id}</span>
+                        <i class="fa-solid ${genderIcon} text-xs" title="${genderLabel}"></i>
+                    </div>
+                    <span class="text-xs text-slate-400 capitalize">${noun.english}</span>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function renderStudyColors() {
+            const grid = document.getElementById('study-colors-grid');
+            grid.innerHTML = '';
+
+            const currentNoun = NOUNS.find(n => n.id === state.studySelectedNoun);
+
+            COLORS.forEach(color => {
+                const isAllowed = currentNoun.allowedColors.includes(color.id);
+                const isSelected = color.id === state.studySelectedColor;
+                
+                const btn = document.createElement('button');
+                btn.className = `p-2.5 rounded-xl border-2 text-left transition-all duration-150 flex items-center space-x-3 shadow-sm relative ${
+                    !isAllowed ? 'opacity-30 cursor-not-allowed' : 'transform hover:scale-[1.02] active:scale-95'
+                } ${
+                    isSelected && isAllowed
+                        ? 'border-indigo-600 bg-indigo-50/50' 
+                        : 'border-slate-200 hover:border-slate-350 bg-white'
+                }`;
+
+                btn.onclick = () => {
+                    if (isAllowed) selectStudyColor(color.id);
+                };
+
+                btn.innerHTML = `
+                    <div class="w-6 h-6 rounded-full shadow-inner border" style="background-color: ${color.hex}; border-color: ${color.outlineHex}"></div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-slate-800 text-xs capitalize">${color.english}</span>
+                        <span class="text-[10px] text-slate-400 font-medium">${currentNoun.gender === 'm' ? color.m : color.f}</span>
+                    </div>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectStudyNoun(nounId) {
+            state.studySelectedNoun = nounId;
+            const noun = NOUNS.find(n => n.id === nounId);
+            
+            // Adjust current selected color if it's not allowed on this noun (e.g., cats/dogs limited to white/black)
+            if (!noun.allowedColors.includes(state.studySelectedColor)) {
+                state.studySelectedColor = noun.allowedColors[0];
+            }
+
+            playSound('pop');
+            renderStudyNouns();
+            renderStudyColors();
+            updateStudyView();
+        }
+
+        function selectStudyColor(colorId) {
+            state.studySelectedColor = colorId;
+            playSound('pop');
+            renderStudyNouns();
+            renderStudyColors();
+            updateStudyView();
+        }
+
+        function updateStudyView() {
+            const noun = NOUNS.find(n => n.id === state.studySelectedNoun);
+            const color = COLORS.find(c => c.id === state.studySelectedColor);
+
+            // Update illustration container
+            const container = document.getElementById('study-illustration-container');
+            container.innerHTML = getSVGGraphic(noun.id, color.id);
+
+            // Update gender badge
+            const genderBadge = document.getElementById('study-gender-badge');
+            const isMasc = noun.gender === 'm';
+            genderBadge.className = `px-3 py-1 rounded-full text-xs font-bold border ${
+                isMasc 
+                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200' 
+                    : 'bg-pink-50 text-pink-700 border-pink-200'
+            }`;
+            genderBadge.innerHTML = `
+                <i class="fa-solid ${isMasc ? 'fa-mars' : 'fa-venus'} mr-1"></i>
+                Noun is ${isMasc ? 'Masculine' : 'Feminine'}
+            `;
+
+            // Update text guides
+            const adjective = isMasc ? color.m : color.f;
+            document.getElementById('study-english-label').innerText = `a ${color.english} ${noun.english}`;
+            document.getElementById('study-arabic-combination').innerHTML = `
+                <span class="text-slate-900">${noun.id}</span> 
+                <span class="${isMasc ? 'text-indigo-600' : 'text-pink-600'}">${adjective}</span>
+            `;
+
+            document.getElementById('study-grammar-explanation').innerHTML = `
+                Because <strong class="text-slate-800">${noun.id}</strong> is <strong class="${isMasc ? 'text-indigo-600' : 'text-pink-600'}">${isMasc ? 'masculine' : 'feminine'}</strong>, 
+                it requires the ${isMasc ? 'masculine' : 'feminine'} adjective color form: <strong class="underline decoration-2">${adjective}</strong>.
+            `;
+        }
+    </script>
+
+    <!-- Quiz Logic & Multiple-Choice Question Generator Engine -->
+    <script>
+        function startQuiz() {
+            state.score = 0;
+            state.streak = 0;
+            state.questionIndex = 0;
+            state.quizHistory = [];
+            state.isAnswered = false;
+            state.selectedAnswer = null;
+
+            navigateTo('quiz');
+            loadNextQuestion();
+        }
+
+        /**
+         * Builds a high-quality randomized question testing agreement or colors.
+         */
+        function generateRandomQuestion() {
+            // Pick random noun
+            const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+            // Pick an allowed color for this noun
+            const allowedColors = noun.allowedColors;
+            const colorId = allowedColors[Math.floor(Math.random() * allowedColors.length)];
+            const color = COLORS.find(c => c.id === colorId);
+
+            // Establish the correct gendered translation form
+            const isMasc = noun.gender === 'm';
+            const correctColorWord = isMasc ? color.m : color.f;
+            const correctPhrase = `${noun.id} ${correctColorWord}`;
+
+            // Decide Question Type to create delicious learning variety:
+            // Type A: 'agreement' - choose correct color form depending on gender (e.g. karahba 7amra vs karahba a7mar)
+            // Type B: 'vocabulary' - choose correct color matching the drawing (e.g. karahba 7amra vs karahba ka7la)
+            const questionType = Math.random() > 0.5 ? 'agreement' : 'vocabulary';
+
+            let options = [];
+
+            if (questionType === 'agreement') {
+                // Testing feminine vs masculine form
+                options.push({
+                    text: `${noun.id} ${isMasc ? color.m : color.f}`,
+                    correct: true,
+                    explanation: 'Correct noun-gender color agreement form.'
+                });
+                options.push({
+                    text: `${noun.id} ${isMasc ? color.f : color.m}`,
+                    correct: false,
+                    explanation: `Wrong gender agreement! Colors on "${noun.id}" must match its ${isMasc ? 'masculine' : 'feminine'} form.`
+                });
+
+                // Add random other colors to fill option list up to 3 or 4 choices if available
+                const otherColors = allowedColors.filter(c => c !== colorId);
+                if (otherColors.length > 0) {
+                    const extraColorId = otherColors[Math.floor(Math.random() * otherColors.length)];
+                    const extraColor = COLORS.find(c => c.id === extraColorId);
+                    options.push({
+                        text: `${noun.id} ${isMasc ? extraColor.m : extraColor.f}`,
+                        correct: false,
+                        explanation: `This is correct grammar but color is actually ${color.english}, not ${extraColor.english}.`
+                    });
+                }
+            } else {
+                // Testing correct color vocabulary match
+                options.push({
+                    text: correctPhrase,
+                    correct: true,
+                    explanation: 'Matches the drawing color and has correct grammar.'
+                });
+
+                // Choose incorrect colors
+                const incorrectColors = allowedColors.filter(c => c !== colorId);
+                // Grab up to 3 distractors
+                const shuffledDistractors = incorrectColors.sort(() => 0.5 - Math.random());
+                const distractorsCount = Math.min(3, shuffledDistractors.length);
+
+                for (let i = 0; i < distractorsCount; i++) {
+                    const distColorObj = COLORS.find(c => c.id === shuffledDistractors[i]);
+                    const distColorWord = isMasc ? distColorObj.m : distColorObj.f;
+                    options.push({
+                        text: `${noun.id} ${distColorWord}`,
+                        correct: false,
+                        explanation: `Grammar is right, but the item in illustration is ${color.english}, not ${distColorObj.english}!`
+                    });
+                }
+
+                // Inject a wrong-gender distractor for high challenge ratio!
+                if (options.length < 4) {
+                    options.push({
+                        text: `${noun.id} ${isMasc ? color.f : color.m}`,
+                        correct: false,
+                        explanation: `The color is right but uses wrong gender agreement form!`
+                    });
+                }
+            }
+
+            // Shuffle option list
+            options = options.sort(() => 0.5 - Math.random());
+
+            return {
+                noun: noun,
+                color: color,
+                correctPhrase: correctPhrase,
+                questionType: questionType,
+                options: options
+            };
+        }
+
+        function loadNextQuestion() {
+            state.isAnswered = false;
+            state.selectedAnswer = null;
+            state.currentQuestion = generateRandomQuestion();
+
+            // Render current progress indicators
+            document.getElementById('quiz-question-num').innerText = state.questionIndex + 1;
+            document.getElementById('quiz-total-num').innerText = state.totalQuestions;
+            
+            const progressPct = ((state.questionIndex) / state.totalQuestions) * 100;
+            document.getElementById('quiz-progress-fill').style.width = `${progressPct}%`;
+
+            // Reset UI components
+            document.getElementById('quiz-feedback-block').classList.add('hidden');
+            
+            const submitBtn = document.getElementById('quiz-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.className = "w-full py-4 px-6 rounded-xl font-bold transition-all duration-150 shadow-md flex items-center justify-center space-x-2 bg-slate-200 text-slate-400 cursor-not-allowed";
+            document.getElementById('quiz-btn-text').innerText = "Select an Answer";
+            document.getElementById('quiz-btn-icon').className = "fa-solid fa-angle-right";
+
+            // Render interactive illustration
+            const container = document.getElementById('quiz-graphic-container');
+            container.innerHTML = getSVGGraphic(state.currentQuestion.noun.id, state.currentQuestion.color.id);
+
+            // Set dynamic header badge in graphics area to guide target English phrase
+            const article = state.currentQuestion.noun.plural ? 'some' : 'a';
+            const genderLabel = state.currentQuestion.noun.gender === 'm' ? 'Masculine ♂' : 'Feminine ♀';
+            
+            document.getElementById('quiz-target-english').innerHTML = `
+                <div class="text-xs bg-slate-200 text-slate-700 px-3 py-1 rounded-full inline-block font-bold uppercase tracking-wide mb-1.5 border border-slate-300">
+                    Noun: <span class="text-indigo-600">${state.currentQuestion.noun.id}</span> (${genderLabel})
+                </div>
+                <div>${article} ${state.currentQuestion.color.english} ${state.currentQuestion.noun.english}</div>
+            `;
+
+            // Populate multiple-choice option buttons
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = '';
+
+            state.currentQuestion.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition duration-150 flex items-center justify-between text-base md:text-lg font-bold text-slate-800 shadow-sm active:scale-[0.99]";
+                btn.onclick = () => selectOption(idx);
+                
+                // Segment words beautifully
+                const words = opt.text.split(' ');
+                const nounWord = words[0];
+                const colorWord = words.slice(1).join(' ');
+
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3.5">
+                        <span class="w-7 h-7 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center text-xs text-slate-500 font-bold">${idx + 1}</span>
+                        <span>${nounWord} <span class="text-indigo-600">${colorWord}</span></span>
+                    </div>
+                    <i class="fa-regular fa-circle text-slate-300 text-lg"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+    </script>
+
+    <!-- Answer choice validation handler -->
+    <script>
+        function selectOption(index) {
+            if (state.isAnswered) return;
+            
+            state.selectedAnswer = index;
+            playSound('pop');
+
+            // Visual update for selection
+            const buttons = document.getElementById('quiz-options-container').children;
+            for (let i = 0; i < buttons.length; i++) {
+                if (i === index) {
+                    buttons[i].className = "w-full text-left p-4 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 transition duration-150 flex items-center justify-between text-base md:text-lg font-bold text-indigo-900 shadow-md scale-[1.01]";
+                    buttons[i].querySelector('i').className = "fa-solid fa-circle-dot text-indigo-600 text-lg";
+                } else {
+                    buttons[i].className = "w-full text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 transition duration-150 flex items-center justify-between text-base md:text-lg font-bold text-slate-800 shadow-sm";
+                    buttons[i].querySelector('i').className = "fa-regular fa-circle text-slate-300 text-lg";
+                }
+            }
+
+            // Enable submit / continue CTA button
+            const submitBtn = document.getElementById('quiz-submit-btn');
+            submitBtn.disabled = false;
+            submitBtn.className = "w-full py-4 px-6 rounded-xl font-bold transition-all duration-150 shadow-lg transform active:scale-95 flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white cursor-pointer shadow-red-200";
+            document.getElementById('quiz-btn-text').innerText = "Check Answer";
+            document.getElementById('quiz-btn-icon').className = "fa-solid fa-check";
+        }
+
+        function handleContinueQuiz() {
+            if (!state.isAnswered) {
+                evaluateAnswer();
+            } else {
+                state.questionIndex++;
+                if (state.questionIndex >= state.totalQuestions) {
+                    showSummaryScreen();
+                } else {
+                    loadNextQuestion();
+                }
+            }
+        }
+
+        function evaluateAnswer() {
+            state.isAnswered = true;
+            const selectedOpt = state.currentQuestion.options[state.selectedAnswer];
+            const isCorrect = selectedOpt.correct;
+
+            // Audio cues
+            if (isCorrect) {
+                playSound('correct');
+                state.score += 10;
+                state.streak++;
+                if (state.streak > state.maxStreak) {
+                    state.maxStreak = state.streak;
+                }
+            } else {
+                playSound('incorrect');
+                state.streak = 0;
+            }
+
+            // Update stats visualizers
+            document.getElementById('quiz-streak').innerText = state.streak;
+            document.getElementById('quiz-score').innerText = state.score;
+            updateHeaderStats();
+
+            // Record this question in history tracker
+            state.quizHistory.push({
+                question: state.currentQuestion,
+                userAnswer: selectedOpt,
+                wasCorrect: isCorrect
+            });
+
+            // Color-code the options list to show target results
+            const buttons = document.getElementById('quiz-options-container').children;
+            state.currentQuestion.options.forEach((opt, idx) => {
+                const btn = buttons[idx];
+                btn.onclick = null; // disable further clicking
+
+                if (opt.correct) {
+                    // Correct green styling
+                    btn.className = "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 transition duration-150 flex items-center justify-between text-base md:text-lg font-bold shadow-md";
+                    btn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-500 text-lg";
+                } else if (idx === state.selectedAnswer) {
+                    // Selected wrong red styling
+                    btn.className = "w-full text-left p-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-900 transition duration-150 flex items-center justify-between text-base md:text-lg font-bold shadow-md animate-shake";
+                    btn.querySelector('i').className = "fa-solid fa-circle-xmark text-red-500 text-lg";
+                } else {
+                    // Dim unselected wrong answers
+                    btn.className = "w-full text-left p-4 rounded-xl border-2 border-slate-100 bg-white opacity-40 transition duration-150 flex items-center justify-between text-base md:text-lg font-bold text-slate-400";
+                    btn.querySelector('i').className = "fa-regular fa-circle text-slate-100 text-lg";
+                }
+            });
+
+            // Display Feedback Panel
+            const feedbackBlock = document.getElementById('quiz-feedback-block');
+            feedbackBlock.classList.remove('hidden');
+
+            const noun = state.currentQuestion.noun;
+            const color = state.currentQuestion.color;
+            const targetColorWord = noun.gender === 'm' ? color.m : color.f;
+
+            if (isCorrect) {
+                feedbackBlock.className = "mt-6 rounded-xl p-4 border border-emerald-200 bg-emerald-50 text-emerald-900 space-y-1 animate-fade-in";
+                feedbackBlock.innerHTML = `
+                    <div class="flex items-center gap-2 font-black text-emerald-950 text-sm">
+                        <i class="fa-solid fa-circle-check text-lg text-emerald-500"></i>
+                        <span>Sahit! Correct!</span>
+                    </div>
+                    <p class="text-xs leading-relaxed">
+                        Indeed, <strong class="capitalize">${noun.id}</strong> takes the ${noun.gender === 'm' ? 'masculine' : 'feminine'} color adjective: <strong>${targetColorWord}</strong>.
+                    </p>
+                `;
+            } else {
+                feedbackBlock.className = "mt-6 rounded-xl p-4 border border-red-200 bg-red-50 text-red-900 space-y-1 animate-fade-in";
+                feedbackBlock.innerHTML = `
+                    <div class="flex items-center gap-2 font-black text-red-950 text-sm">
+                        <i class="fa-solid fa-circle-xmark text-lg text-red-500"></i>
+                        <span>Oops! Incorrect.</span>
+                    </div>
+                    <p class="text-xs leading-relaxed mb-1.5">
+                        ${selectedOpt.explanation}
+                    </p>
+                    <div class="text-[11px] bg-white/50 p-2 rounded-lg border border-red-100 text-red-950">
+                        <strong class="uppercase text-[9px] text-red-600 block mb-0.5">Grammar Rule:</strong>
+                        Noun <strong class="capitalize">${noun.id}</strong> is <strong>${noun.gender === 'm' ? 'masculine (m)' : 'feminine (f)'}</strong>. <br>
+                        The correct form is <strong>${noun.id} <span class="underline decoration-2 font-bold">${targetColorWord}</span></strong>.
+                    </div>
+                `;
+            }
+
+            // Transform submit CTA to "Continue" button
+            const submitBtn = document.getElementById('quiz-submit-btn');
+            submitBtn.className = "w-full py-4 px-6 rounded-xl font-bold transition-all duration-150 shadow-md flex items-center justify-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white cursor-pointer";
+            document.getElementById('quiz-btn-text').innerText = "Continue Next";
+            document.getElementById('quiz-btn-icon').className = "fa-solid fa-arrow-right";
+        }
+    </script>
+
+    <!-- Summary Screen Data Render Engine -->
+    <script>
+        function showSummaryScreen() {
+            navigateTo('summary');
+            playSound('win');
+
+            // Render numeric achievements stats
+            document.getElementById('summary-score').innerText = state.score;
+            document.getElementById('summary-max-streak').innerText = state.maxStreak;
+            
+            const accuracy = Math.round((state.score / (state.totalQuestions * 10)) * 100);
+            document.getElementById('summary-accuracy').innerText = `${accuracy}%`;
+
+            // Style accuracy percentage indicator
+            const accColor = document.getElementById('summary-accuracy-color');
+            if (accuracy >= 80) {
+                accColor.className = "text-3xl font-black text-emerald-600 flex items-center justify-center gap-1.5";
+            } else if (accuracy >= 50) {
+                accColor.className = "text-3xl font-black text-amber-500 flex items-center justify-center gap-1.5";
+            } else {
+                accColor.className = "text-3xl font-black text-red-500 flex items-center justify-center gap-1.5";
+            }
+
+            // Populate Breakdown List
+            const listContainer = document.getElementById('summary-breakdown-list');
+            listContainer.innerHTML = '';
+
+            state.quizHistory.forEach((hist, idx) => {
+                const item = hist.question;
+                const wasCorrect = hist.wasCorrect;
+                const genderSymbol = item.noun.gender === 'm' ? '♂' : '♀';
+
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-sm transition duration-150 ${
+                    wasCorrect 
+                        ? 'border-emerald-100 bg-emerald-50/40 text-emerald-950' 
+                        : 'border-red-100 bg-red-50/40 text-red-950'
+                }`;
+
+                div.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <span class="w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold shrink-0 mt-0.5 ${
+                            wasCorrect ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
+                        }">${idx + 1}</span>
+                        <div>
+                            <div class="font-extrabold flex items-center gap-1.5">
+                                <span class="capitalize text-slate-900">${item.noun.id}</span>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-600 font-bold uppercase">${item.noun.gender} ${genderSymbol}</span>
+                                <span class="text-slate-400 font-normal">(${item.color.english})</span>
+                            </div>
+                            <div class="text-xs text-slate-500 mt-0.5">
+                                Your answer: <span class="font-bold underline decoration-indigo-300 decoration-2">${hist.userAnswer.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                            wasCorrect ? 'bg-emerald-200/50 text-emerald-800' : 'bg-red-200/50 text-red-800'
+                        }">
+                            <i class="fa-solid ${wasCorrect ? 'fa-check-double' : 'fa-triangle-exclamation'} mr-1"></i>
+                            ${wasCorrect ? 'Sahit (Correct)' : 'Try Again'}
+                        </span>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+    </script>
+
+    <!-- Initializer Trigger on Window Load -->
+    <script>
+        window.onload = function() {
+            // Initiate app stats visual representation
+            updateHeaderStats();
+            navigateTo('welcome');
+        };
+    </script>
+</body>
+</html>
