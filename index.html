@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tunisian Arabic Interactive Games</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e1e8ed;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-color: #3498db;
+        }
+        .card h2 {
+            margin: 0 0 10px 0;
+            color: #2980b9;
+            font-size: 1.4rem;
+        }
+        .card p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.4;
+        }
+        .badge {
+            align-self: flex-start;
+            background-color: #e8f4fd;
+            color: #3498db;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tunisian Arabic Learning Hub</h1>
+    <p>Select a game below to start practicing your vocabulary and grammar!</p>
+
+    <div class="grid">
+        <a href="./taswira-challenge/" class="card">
+            <div class="badge">Vocabulary</div>
+            <h2>Taswira Challenge</h2>
+            <p>Practice visual recognition and expand your Tunisian Arabic vocabulary base.</p>
+        </a>
+
+        <a href="./colors-challenge/" class="card">
+            <div class="badge">Basics</div>
+            <h2>Colors Challenge</h2>
+            <p>Master color terminology and spelling rules through interactive gameplay.</p>
+        </a>
+
+        <a href="./win-el-qattous-game/" class="card">
+            <div class="badge">Immersion</div>
+            <h2>Win el-Qattous?</h2>
+            <p>Test your listening and preposition skills to find out where the cat is hiding.</p>
+        </a>
+    </div>
+
+</body>
+</html>
